@@ -34,11 +34,12 @@ def post_list(request):
             return Response(serializer.data)
 
 
-@api_view(['GET','PUT'])
+@api_view(['GET','PUT','DELETE'])
 def post_detail(request, id):
-
+   
     # Get the post object or return a 404 error if not found
-    post = get_object_or_404(Post, pk=id, status=True)
+    post = get_object_or_404(Post, pk=id, 
+                                        status=True)
 
     # Handle GET request
     if request.method == 'GET':
@@ -48,13 +49,22 @@ def post_detail(request, id):
         
         # Return the serialized data as a response
         return Response(serializer.data)
-        # Handle POST request
+        
+        # Handle PUT request
     elif request.method == 'PUT':
         # Create a serializer instance with the request data
-        serializer = PostSerializer(post, data=request.data)
+        serializer = PostSerializer(post,
+         data=request.data)
         # Validate the serializer data
         if serializer.is_valid(raise_exception=True):
         # Save the new post
             serializer.save()
         #  Return the serialized data of the new post
         return Response(serializer.data)
+
+     # Handle DELETE request
+    elif request.method == 'DELETE':  
+        post.delete()  
+        #  Return the serialized data of the new post
+        return Response({'detail':'item removed successfully'}, 
+                                                                 status=status.HTTP_204_NO_CONTENT)
